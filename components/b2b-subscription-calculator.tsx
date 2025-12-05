@@ -5,6 +5,13 @@ import { Download, Send, Plus, X, AlertCircle } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+// Extend jsPDF type for autoTable plugin
+interface jsPDFWithAutoTable extends jsPDF {
+  lastAutoTable: {
+    finalY: number;
+  };
+}
+
 // TypeScript Interfaces
 interface TierSeats {
   tier1: number;
@@ -378,7 +385,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
         doc.text('Seat Allocation', 14, yPos);
         yPos += 8;
 
-        const seatData: any[] = [];
+        const seatData: string[][] = [];
         if (tierSeats.tier1 > 0) {
           seatData.push([
             tierPricing.tier1.name,
@@ -413,7 +420,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
           styles: { fontSize: 10 }
         });
 
-        yPos = (doc as any).lastAutoTable.finalY + 10;
+        yPos = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 10;
       }
 
       // Add-ons Section
@@ -432,7 +439,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
           styles: { fontSize: 10 }
         });
 
-        yPos = (doc as any).lastAutoTable.finalY + 10;
+        yPos = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 10;
       }
 
       // Additional Courses Section
@@ -442,7 +449,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
         doc.text('Pay-as-you-go Courses', 14, yPos);
         yPos += 8;
 
-        const courseData: any[] = [];
+        const courseData: string[][] = [];
         if (calculations.additionalCoursesDetails.tier1) {
           calculations.additionalCoursesDetails.tier1.courses.forEach(course => {
             courseData.push([
@@ -475,7 +482,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
           styles: { fontSize: 10 }
         });
 
-        yPos = (doc as any).lastAutoTable.finalY + 10;
+        yPos = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 10;
       }
 
       // Cost Summary
@@ -484,7 +491,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
       doc.text('Cost Summary', 14, yPos);
       yPos += 8;
 
-      const summaryData: any[] = [
+      const summaryData: string[][] = [
         ['Subscription Subtotal', formatCurrency(calculations.subtotal)]
       ];
 
@@ -517,7 +524,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
       });
 
       // Footer
-      const finalY = (doc as any).lastAutoTable.finalY + 20;
+      const finalY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 20;
       doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 100, 100);
