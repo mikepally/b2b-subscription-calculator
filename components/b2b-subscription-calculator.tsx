@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Calculator, Download, Send, Users, DollarSign, Package, Plus, X, AlertCircle } from 'lucide-react';
+import { Download, Send, Plus, X, AlertCircle } from 'lucide-react';
 
 // TypeScript Interfaces
 interface TierSeats {
@@ -113,15 +113,15 @@ const B2BSubscriptionCalculator: React.FC = () => {
     discountNote: ''
   });
 
-const tierPricing: TierPricing = {
-  tier1: { price: 75, name: 'Tier 1: Awareness', description: 'Basic access to up to $50 courses' },
-  tier2: { price: 149, name: 'Tier 2: Professional', description: 'Competent Person & Technical Training up to $150' },
-  tier3: { price: 249, name: 'Tier 3: Total Access', description: 'Full catalog including OSHA 30, HAZWOPER, DOT Haz' }
-};
+  const tierPricing: TierPricing = {
+    tier1: { price: 75, name: 'Tier 1: Awareness', description: 'Basic access to all courses up to $50 and below' },
+    tier2: { price: 149, name: 'Tier 2: Professional', description: 'Competent Person & Technical Training up to $150' },
+    tier3: { price: 249, name: 'Tier 3: Total Access', description: 'Full catalog including OSHA 30, HAZWOPER, DOT HazMat' }
+  };
 
-const addOnPricing: AddOnPricing = {
-  teamPortal: { price: 500, name: 'Team Portal', description: 'Advanced team management features' }
-};
+  const addOnPricing: AddOnPricing = {
+    teamPortal: { price: 500, name: 'Team Portal', description: 'Advanced team management features' }
+  };
 
   const getDiscountRate = (totalSeats: number): number => {
     if (totalSeats >= 1000) return 0.75;  // 75% discount for 1000+ seats
@@ -315,47 +315,30 @@ const addOnPricing: AddOnPricing = {
   };
 
   return (
-    <div className="min-h-screen bg-etrain-light-gray">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Branded Header */}
-      <div className="bg-etrain-dark-blue shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-etrain-orange text-white p-2 rounded-lg">
-                <Calculator className="w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white">eTrainToday</h1>
-                <p className="text-sm text-gray-300">B2B Subscription Calculator</p>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <a 
-                href="https://etraintoday.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-etrain-orange hover:text-white transition-colors text-sm font-medium"
-              >
-                Visit eTrainToday.com →
-              </a>
-            </div>
+      <div className="bg-[#1A2332] shadow-lg py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img 
+              src="/etraining-logo.png" 
+              alt="eTraining Logo" 
+              className="h-12"
+            />
+          </div>
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
+              Enterprise training subscription calculator
+            </h1>
+            <p className="text-lg text-gray-300 leading-relaxed">
+              Quickly estimate your team's training costs with tier-based pricing and automatic volume discounts
+            </p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Hero Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
-          <div className="max-w-3xl">
-            <h2 className="text-3xl font-bold text-etrain-dark-blue mb-3">
-              Calculate Your Enterprise Training Subscription
-            </h2>
-            <p className="text-lg text-etrain-medium-gray leading-relaxed">
-              Configure your team's safety training subscription with tier-based seat allocation, 
-              automatic volume discounts, and flexible pay-as-you-go course options.
-            </p>
-          </div>
-        </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 rounded-lg p-4 mb-8 flex items-start gap-3 shadow-sm" role="alert">
@@ -371,107 +354,75 @@ const addOnPricing: AddOnPricing = {
           {/* Left Column - Input Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* Step 1: Seat Allocation */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-etrain-orange/10 p-2 rounded-lg">
-                  <Users className="w-5 h-5 text-etrain-orange" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-etrain-dark-blue">Step 1: Allocate Employee Seats</h2>
-                  <p className="text-sm text-etrain-medium-gray">Choose the right tier for each employee</p>
-                </div>
-              </div>
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Step 1. Allocate employee seats</h2>
               
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {Object.entries(tierPricing).map(([key, tier]) => (
-                  <div key={key} className="border-2 border-gray-200 rounded-xl p-5 hover:border-etrain-orange hover:shadow-md transition-all duration-200">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                      <div className="md:col-span-2">
-                        <h3 className="font-bold text-etrain-dark-blue text-lg">{tier.name}</h3>
-                        <p className="text-sm text-etrain-medium-gray mt-1">{tier.description}</p>
-                        <p className="text-xl font-bold text-etrain-orange mt-3">
-                          {formatCurrency(tier.price)} <span className="text-sm font-normal text-etrain-medium-gray">per employee/year</span>
-                        </p>
-                      </div>
-                      <div>
-                        <label htmlFor={`seats-${key}`} className="block text-sm font-semibold text-etrain-dark-blue mb-2">
-                          Number of Seats
-                        </label>
-                        <input
-                          id={`seats-${key}`}
-                          type="number"
-                          min="0"
-                          max="10000"
-                          value={tierSeats[key as keyof TierSeats]}
-                          onChange={(e) => handleSeatChange(key as keyof TierSeats, e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') e.preventDefault();
-                          }}
-                          className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-etrain-orange focus:border-etrain-orange transition-colors text-lg font-semibold"
-                          placeholder="0"
-                          aria-label={`Number of seats for ${tier.name}`}
-                          aria-describedby={`${key}-description`}
-                        />
-                      </div>
+                  <div key={key} className="bg-[#1A2332] rounded-lg p-5 border-2 border-gray-700 hover:border-etrain-orange hover:shadow-md transition-all duration-200 flex flex-col">
+                    <div className="flex-grow mb-4">
+                      <h3 className="font-semibold text-white text-base mb-2">{tier.name}</h3>
+                      <p className="text-sm text-gray-300 h-[48px] mb-4">{tier.description}</p>
+                      <p className="text-lg font-bold text-etrain-orange">
+                        {formatCurrency(tier.price)}<span className="text-xs font-normal text-gray-500">/employee/year</span>
+                      </p>
+                    </div>
+                    <div>
+                      <label htmlFor={`seats-${key}`} className="block text-xs font-medium text-white mb-1">
+                        Seats
+                      </label>
+                      <input
+                        id={`seats-${key}`}
+                        type="number"
+                        min="0"
+                        max="10000"
+                        value={tierSeats[key as keyof TierSeats]}
+                        onChange={(e) => handleSeatChange(key as keyof TierSeats, e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') e.preventDefault();
+                        }}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-etrain-orange focus:border-transparent text-base"
+                        placeholder="0"
+                        aria-label={`Number of seats for ${tier.name}`}
+                        aria-describedby={`${key}-description`}
+                      />
                     </div>
                   </div>
                 ))}
               </div>
-              
-              <div className="mt-6 p-4 bg-etrain-orange/10 border-2 border-etrain-orange/20 rounded-xl">
-                <p className="text-center text-lg font-bold text-etrain-dark-blue">
-                  Total Seats: <span className="text-etrain-orange text-2xl">{calculations.totalSeats}</span>
-                </p>
-              </div>
             </div>
 
             {/* Step 2: Add-ons */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="bg-etrain-orange/10 p-2 rounded-lg">
-                  <Package className="w-5 h-5 text-etrain-orange" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-etrain-dark-blue">Step 2: Select Add-ons</h2>
-                  <p className="text-sm text-etrain-medium-gray">Enhance your training platform</p>
-                </div>
-              </div>
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Step 2. Select add-ons</h2>
               
               <div className="space-y-3">
-                <label htmlFor="addon-team-portal" className="flex items-start gap-4 p-4 border-2 border-gray-200 rounded-xl hover:border-etrain-orange hover:bg-etrain-orange/5 cursor-pointer transition-all duration-200">
+                <label htmlFor="addon-team-portal" className="flex items-start gap-3 p-5 bg-[#1A2332] border-2 border-gray-700 rounded-lg cursor-pointer hover:border-etrain-orange hover:shadow-md transition-all duration-200">
                   <input
                     id="addon-team-portal"
                     type="checkbox"
                     checked={addOns.teamPortal}
                     onChange={(e) => setAddOns({ ...addOns, teamPortal: e.target.checked })}
-                    className="mt-1 w-5 h-5 text-etrain-orange border-gray-300 rounded focus:ring-etrain-orange accent-etrain-orange"
+                    className="mt-0.5 w-4 h-4 text-etrain-orange border-gray-300 rounded focus:ring-etrain-orange accent-etrain-orange"
                     aria-label="Add Team Portal add-on"
                     aria-describedby="addon-team-portal-description"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-etrain-dark-blue">{addOnPricing.teamPortal.name}</h3>
-                      <span className="font-bold text-etrain-orange text-lg">
-                        +{formatCurrency(addOnPricing.teamPortal.price)}<span className="text-sm font-normal text-etrain-medium-gray">/year</span>
+                      <h3 className="font-semibold text-white">{addOnPricing.teamPortal.name}</h3>
+                      <span className="font-semibold text-etrain-orange">
+                        +{formatCurrency(addOnPricing.teamPortal.price)}<span className="text-xs font-normal text-gray-500">/year</span>
                       </span>
                     </div>
-                    <p className="text-sm text-etrain-medium-gray mt-1">{addOnPricing.teamPortal.description}</p>
+                    <p className="text-sm text-gray-300 mt-1">{addOnPricing.teamPortal.description}</p>
                   </div>
                 </label>
               </div>
             </div>
 
             {/* Step 3: Pay-As-You-Go Courses */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="bg-etrain-orange/10 p-2 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-etrain-orange" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-etrain-dark-blue">Step 3: Pay-As-You-Go Course Purchases</h2>
-                  <p className="text-sm text-etrain-medium-gray">Add individual courses with tier discounts</p>
-                </div>
-              </div>
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Step 3. Pay-as-you-go courses <span className="text-lg font-normal text-gray-500">(Optional)</span></h2>
               
               <p className="text-sm text-etrain-medium-gray mb-6 leading-relaxed">
                 Calculate additional pay-as-you-go course purchases separately from your subscription. 
@@ -660,8 +611,8 @@ const addOnPricing: AddOnPricing = {
               )}
 
               {tierSeats.tier1 === 0 && tierSeats.tier2 === 0 && (
-                <div className="text-center py-8 px-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                  <p className="text-etrain-medium-gray font-medium">
+                <div className="text-center py-8 px-4 bg-[#1A2332] rounded-xl border-2 border-dashed border-gray-600">
+                  <p className="text-gray-300 font-medium">
                     Add Tier 1 or Tier 2 seats to unlock discounted pay-as-you-go course purchases
                   </p>
                 </div>
@@ -679,25 +630,60 @@ const addOnPricing: AddOnPricing = {
 
           {/* Right Column - Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-6">
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-etrain-orange/20">
-                <div className="bg-etrain-orange/10 p-2 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-etrain-orange" />
+            <div className="bg-white rounded-xl p-8 sticky top-6 shadow-lg border border-gray-200">
+              
+              {/* Key Metrics - Large Numbers */}
+              <div className="space-y-6 mb-8">
+                <div>
+                  <div className="text-6xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                    {formatCurrency(calculations.finalTotal)}
+                  </div>
+                  <div className="text-sm text-gray-600">Annual total</div>
                 </div>
-                <h2 className="text-xl font-bold text-etrain-dark-blue">Cost Summary</h2>
+                
+                {calculations.totalSeats > 0 && (
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                      {formatCurrency(calculations.subtotal)}
+                    </div>
+                    <div className="text-sm text-gray-600">Subscription cost</div>
+                  </div>
+                )}
+                
+                {calculations.discount > 0 && (
+                  <div>
+                    <div className="text-3xl font-bold text-etrain-orange mb-1">
+                      {formatCurrency(calculations.discount)}
+                    </div>
+                    <div className="text-sm text-gray-600">Volume discount ({Math.round(calculations.discountRate * 100)}%)</div>
+                  </div>
+                )}
+                
+                {calculations.totalSeats > 0 && (
+                  <div>
+                    <div className="text-3xl font-bold text-gray-900 mb-1">
+                      {calculations.totalSeats}
+                    </div>
+                    <div className="text-sm text-gray-600">Total seats</div>
+                  </div>
+                )}
               </div>
+              
+              {/* Detailed Breakdown */}
+              <div className="pt-6 border-t border-gray-300">
               
               {/* Tier Breakdown */}
               {calculations.totalSeats > 0 && (
-                <div className="space-y-3 mb-4 pb-4 border-b border-gray-200">
+                <div className="space-y-2 mb-4">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Breakdown</div>
                   {Object.entries(tierSeats).map(([key, seats]) => {
                     if (seats === 0) return null;
                     return (
-                      <div key={key} className="flex justify-between items-center">
-                        <span className="text-sm text-etrain-medium-gray">
-                          {tierPricing[key as keyof TierPricing].name.split(':')[1]} <span className="font-semibold">({seats} seats)</span>
+                      <div key={key} className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">
+                          {tierPricing[key as keyof TierPricing].name.split(':')[1]?.trim() || tierPricing[key as keyof TierPricing].name} ({seats})
                         </span>
-                        <span className="font-bold text-etrain-dark-blue">
+                        <span className="font-semibold text-gray-900">
                           {formatCurrency(seats * tierPricing[key as keyof TierPricing].price)}
                         </span>
                       </div>
@@ -706,23 +692,11 @@ const addOnPricing: AddOnPricing = {
                 </div>
               )}
               
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-etrain-medium-gray font-medium">Subtotal</span>
-                  <span className="font-bold text-etrain-dark-blue text-lg">{formatCurrency(calculations.subtotal)}</span>
-                </div>
-                
-                {calculations.discount > 0 && (
-                  <div className="flex justify-between items-center bg-etrain-success/10 -mx-2 px-2 py-2 rounded-lg">
-                    <span className="text-etrain-success font-semibold">Volume Discount</span>
-                    <span className="font-bold text-etrain-success text-lg">-{formatCurrency(calculations.discount)}</span>
-                  </div>
-                )}
-                
+              <div className="space-y-2">
                 {calculations.addOnsTotal > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-etrain-medium-gray font-medium">Add-ons</span>
-                    <span className="font-bold text-etrain-dark-blue">+{formatCurrency(calculations.addOnsTotal)}</span>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">Add-ons</span>
+                    <span className="font-semibold text-gray-900">{formatCurrency(calculations.addOnsTotal)}</span>
                   </div>
                 )}
                 
@@ -756,94 +730,58 @@ const addOnPricing: AddOnPricing = {
                     </div>
                   </>
                 )}
-                
-                <div className="pt-4 mt-4 border-t-2 border-etrain-dark-blue/20">
-                  <div className="bg-etrain-orange/10 rounded-xl p-4 -mx-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-etrain-dark-blue">Annual Total</span>
-                      <span className="text-3xl font-bold text-etrain-orange">
-                        {formatCurrency(calculations.finalTotal)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                {calculations.discountNote && (
-                  <div className="mt-4 p-3 bg-etrain-success/10 border-l-4 border-etrain-success rounded-lg">
-                    <p className="text-sm text-etrain-success text-center font-semibold">
-                      {calculations.discountNote}
-                    </p>
-                  </div>
-                )}
               </div>
               
               {/* Action Buttons */}
-              <div className="mt-6 space-y-3 pt-6 border-t border-gray-200">
+              <div className="mt-8 space-y-3">
                 <button
                   onClick={handleExportPDF}
                   disabled={calculations.totalSeats === 0}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-etrain-orange text-white font-semibold text-base rounded-xl hover:bg-etrain-orange/90 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3.5 bg-etrain-orange text-white font-bold rounded-xl hover:bg-etrain-orange/90 hover:shadow-lg transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
                   aria-label="Download quote as PDF"
                 >
                   <Download className="w-5 h-5" />
-                  Download Quote PDF
+                  Download PDF
                 </button>
                 <button
                   onClick={handleSendToSales}
                   disabled={calculations.totalSeats === 0}
-                  className="w-full flex items-center justify-center gap-2 px-5 py-3.5 border-2 border-etrain-dark-blue text-etrain-dark-blue font-semibold text-base rounded-xl hover:bg-etrain-dark-blue hover:text-white transition-all duration-200 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 px-5 py-3.5 border-2 border-gray-300 text-gray-700 font-bold rounded-xl hover:border-etrain-orange hover:bg-gray-50 hover:shadow-lg transition-all duration-200 disabled:text-gray-400 disabled:cursor-not-allowed disabled:border-gray-200"
                   aria-label="Send quote to sales team"
                 >
                   <Send className="w-5 h-5" />
-                  Send to Sales Team
+                  Send to Sales
                 </button>
               </div>
-              
-              {/* Disclaimer */}
-              <p className="mt-6 text-xs text-etrain-medium-gray text-center leading-relaxed">
-                This is an estimate and subject to final sales agreement
-              </p>
+
+              {/* Ready to Get Started Section */}
+              <div className="mt-8 pt-8 border-t border-gray-300 text-center">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                  Ready to get started?
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Contact our team to discuss your training needs and get a personalized quote.
+                </p>
+                <a 
+                  href="mailto:sales@etraintoday.com?subject=B2B%20Subscription%20Inquiry" 
+                  className="inline-block px-6 py-3 bg-etrain-orange text-white font-medium rounded-lg hover:bg-etrain-orange/90 transition-colors"
+                >
+                  Contact Sales
+                </a>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-12 bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold text-etrain-dark-blue mb-3">
-              Ready to Get Started?
-            </h3>
-            <p className="text-etrain-medium-gray mb-6 max-w-2xl mx-auto">
-              Our team is ready to help you build a custom training solution for your organization. 
-              Contact us today to discuss your specific needs and get personalized recommendations.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a 
-                href="https://etraintoday.com/contact-us/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-etrain-orange text-white font-semibold rounded-xl hover:bg-etrain-orange/90 transition-colors shadow-sm"
-              >
-                Contact Sales Team
-              </a>
-              <a 
-                href="https://etraintoday.com/course-catalog/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 border-2 border-etrain-dark-blue text-etrain-dark-blue font-semibold rounded-xl hover:bg-etrain-dark-blue hover:text-white transition-colors"
-              >
-                Browse Course Catalog
-              </a>
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-            <p className="text-sm text-etrain-medium-gray">
-              © {new Date().getFullYear()} eTraining, Inc. All Rights Reserved. | 
-              <a href="https://etraintoday.com" target="_blank" rel="noopener noreferrer" className="text-etrain-orange hover:underline ml-1">
-                eTrainToday.com
-              </a>
-            </p>
-          </div>
+        <div className="mt-16 pt-6 border-t border-gray-200">
+          <p className="text-sm text-etrain-medium-gray text-center px-4">
+            © {new Date().getFullYear()} eTraining, Inc. All Rights Reserved. | 
+            <a href="https://etraintoday.com" target="_blank" rel="noopener noreferrer" className="text-etrain-orange hover:underline ml-1">
+              eTrainToday.com
+            </a>
+          </p>
+        </div>
         </div>
       </div>
     </div>
