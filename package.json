@@ -1,0 +1,41 @@
+{
+  "name": "b2b-subscription-calculator",
+  "version": "1.0.0",
+  "description": "B2B Subscription Calculator with tier-based pricing and volume discounts",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "b2b",
+    "subscription",
+    "calculator",
+    "pricing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "lucide-react": "^0.454.0",
+    "next": "^14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.48.1",
+    "@typescript-eslint/parser": "^8.48.1",
+    "autoprefixer": "^10.4.22",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.15",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.6.3"
+  }
+}
