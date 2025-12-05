@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    /* eTrainToday Brand Colors */
+    --etrain-orange: #FF6B35;
+    --etrain-dark-blue: #1A2332;
+    --etrain-navy: #2C3E50;
+    --etrain-light-gray: #F5F7FA;
+    --etrain-medium-gray: #8B95A5;
+    --etrain-success: #27AE60;
+    --etrain-warning: #F39C12;
+  }
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -15,9 +28,10 @@ body {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--etrain-light-gray);
 }
