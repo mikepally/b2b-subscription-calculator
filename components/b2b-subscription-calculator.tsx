@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Download, Send, Plus, X, AlertCircle } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // TypeScript Interfaces
 interface TierSeats {
@@ -234,6 +236,14 @@ const B2BSubscriptionCalculator: React.FC = () => {
   }, [tierSeats, addOns, additionalCourses]);
 
   const handleSeatChange = (tier: keyof TierSeats, value: string): void => {
+    // Allow empty string temporarily for better UX when clearing
+    if (value === '') {
+      setTierSeats((prev: TierSeats) => ({
+        ...prev,
+        [tier]: 0
+      }));
+      return;
+    }
     const numValue = Math.min(10000, Math.max(0, parseInt(value, 10) || 0)); // Max 10,000 seats
     setTierSeats((prev: TierSeats) => ({
       ...prev,
@@ -289,12 +299,236 @@ const B2BSubscriptionCalculator: React.FC = () => {
     }));
   };
 
-  const handleExportPDF = (): void => {
+  const handleExportPDF = async (): Promise<void> => {
     if (calculations.totalSeats === 0) {
       setError('Please add at least one seat before exporting.');
       return;
     }
-    alert('PDF export functionality would be implemented here using jsPDF or similar library');
+
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.width;
+      let yPos = 20;
+
+      // Header with logo
+      doc.setFillColor(26, 35, 50); // Navy blue
+      doc.rect(0, 0, pageWidth, 50, 'F');
+      
+      // Load and add logo with optimal quality (4x upscaling with high-quality smoothing)
+      try {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = '/etraining-logo.png';
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          setTimeout(reject, 2000); // 2 second timeout
+        });
+        
+        // Scale up the image 4x for excellent resolution
+        const scaleFactor = 4;
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width * scaleFactor;
+        canvas.height = img.height * scaleFactor;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          // Use high-quality smoothing for clean edges
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          
+          // Draw image at 4x scale
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // Get maximum quality base64 PNG
+          const imgData = canvas.toDataURL('image/png', 1.0);
+          
+          // Add logo at smaller size for sharper appearance
+          const logoHeight = 12;
+          const logoWidth = (img.width / img.height) * logoHeight;
+          doc.addImage(imgData, 'PNG', (pageWidth - logoWidth) / 2, 12, logoWidth, logoHeight, undefined, 'NONE');
+        }
+        
+        // Title below logo
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Training Subscription Quote', pageWidth / 2, 35, { align: 'center' });
+      } catch (logoErr) {
+        // If logo fails to load, just show text
+        console.warn('Logo failed to load, using text only', logoErr);
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(24);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Training Subscription Quote', pageWidth / 2, 30, { align: 'center' });
+      }
+      
+      yPos = 60;
+      doc.setTextColor(0, 0, 0);
+
+      // Date
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, 14, yPos);
+      yPos += 15;
+
+      // Seat Allocation Section
+      if (calculations.totalSeats > 0) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Seat Allocation', 14, yPos);
+        yPos += 8;
+
+        const seatData: any[] = [];
+        if (tierSeats.tier1 > 0) {
+          seatData.push([
+            tierPricing.tier1.name,
+            tierSeats.tier1.toString(),
+            formatCurrency(tierPricing.tier1.price),
+            formatCurrency(calculations.tierSubtotals?.tier1 || 0)
+          ]);
+        }
+        if (tierSeats.tier2 > 0) {
+          seatData.push([
+            tierPricing.tier2.name,
+            tierSeats.tier2.toString(),
+            formatCurrency(tierPricing.tier2.price),
+            formatCurrency(calculations.tierSubtotals?.tier2 || 0)
+          ]);
+        }
+        if (tierSeats.tier3 > 0) {
+          seatData.push([
+            tierPricing.tier3.name,
+            tierSeats.tier3.toString(),
+            formatCurrency(tierPricing.tier3.price),
+            formatCurrency(calculations.tierSubtotals?.tier3 || 0)
+          ]);
+        }
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Tier', 'Seats', 'Price per Seat', 'Subtotal']],
+          body: seatData,
+          theme: 'grid',
+          headStyles: { fillColor: [26, 35, 50], textColor: [255, 255, 255] },
+          styles: { fontSize: 10 }
+        });
+
+        yPos = (doc as any).lastAutoTable.finalY + 10;
+      }
+
+      // Add-ons Section
+      if (addOns.teamPortal) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Add-ons', 14, yPos);
+        yPos += 8;
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Add-on', 'Price']],
+          body: [['Team Portal', formatCurrency(addOnPricing.teamPortal.price)]],
+          theme: 'grid',
+          headStyles: { fillColor: [26, 35, 50], textColor: [255, 255, 255] },
+          styles: { fontSize: 10 }
+        });
+
+        yPos = (doc as any).lastAutoTable.finalY + 10;
+      }
+
+      // Additional Courses Section
+      if (calculations.additionalCoursesTotal > 0) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Pay-as-you-go Courses', 14, yPos);
+        yPos += 8;
+
+        const courseData: any[] = [];
+        if (calculations.additionalCoursesDetails.tier1) {
+          calculations.additionalCoursesDetails.tier1.courses.forEach(course => {
+            courseData.push([
+              course.name,
+              course.quantity.toString(),
+              formatCurrency(parseFloat(course.price)),
+              formatCurrency(course.discountedCost),
+              '30% off'
+            ]);
+          });
+        }
+        if (calculations.additionalCoursesDetails.tier2) {
+          calculations.additionalCoursesDetails.tier2.courses.forEach(course => {
+            courseData.push([
+              course.name,
+              course.quantity.toString(),
+              formatCurrency(parseFloat(course.price)),
+              formatCurrency(course.discountedCost),
+              '50% off'
+            ]);
+          });
+        }
+
+        autoTable(doc, {
+          startY: yPos,
+          head: [['Course', 'Qty', 'Price', 'Total', 'Discount']],
+          body: courseData,
+          theme: 'grid',
+          headStyles: { fillColor: [26, 35, 50], textColor: [255, 255, 255] },
+          styles: { fontSize: 10 }
+        });
+
+        yPos = (doc as any).lastAutoTable.finalY + 10;
+      }
+
+      // Cost Summary
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Cost Summary', 14, yPos);
+      yPos += 8;
+
+      const summaryData: any[] = [
+        ['Subscription Subtotal', formatCurrency(calculations.subtotal)]
+      ];
+
+      if (calculations.discount > 0) {
+        summaryData.push([
+          `Volume Discount (${(calculations.discountRate * 100).toFixed(0)}%)`,
+          `-${formatCurrency(calculations.discount)}`
+        ]);
+      }
+
+      if (calculations.addOnsTotal > 0) {
+        summaryData.push(['Add-ons', formatCurrency(calculations.addOnsTotal)]);
+      }
+
+      if (calculations.additionalCoursesTotal > 0) {
+        summaryData.push(['Pay-as-you-go Courses', formatCurrency(calculations.additionalCoursesTotal)]);
+      }
+
+      summaryData.push(['Annual Total', formatCurrency(calculations.finalTotal)]);
+
+      autoTable(doc, {
+        startY: yPos,
+        body: summaryData,
+        theme: 'plain',
+        styles: { fontSize: 11, cellPadding: 3 },
+        columnStyles: {
+          0: { fontStyle: 'bold', halign: 'right' },
+          1: { halign: 'right', fontStyle: 'bold' }
+        }
+      });
+
+      // Footer
+      const finalY = (doc as any).lastAutoTable.finalY + 20;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 100, 100);
+      doc.text('This is an estimate. Final pricing may vary. Contact sales@etraintoday.com for details.', pageWidth / 2, finalY, { align: 'center' });
+
+      // Save PDF
+      doc.save(`etraining-quote-${new Date().toISOString().split('T')[0]}.pdf`);
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      setError('Failed to generate PDF. Please try again.');
+    }
   };
 
   const handleSendToSales = (): void => {
@@ -378,6 +612,7 @@ const B2BSubscriptionCalculator: React.FC = () => {
                         max="10000"
                         value={tierSeats[key as keyof TierSeats]}
                         onChange={(e) => handleSeatChange(key as keyof TierSeats, e.target.value)}
+                        onFocus={(e) => e.target.select()}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') e.preventDefault();
                         }}
